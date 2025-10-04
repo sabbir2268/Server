@@ -83,10 +83,37 @@ async function run() {
     });
 
     // user related APIs
+    app.get("/users", async (req, res) => {
+      const result = await usersCollection.find().toArray();
+      res.send(result);
+    });
+
+    // user related APIs
     app.post("/users", async (req, res) => {
       const userProfile = req.body;
       console.log(userProfile);
       const result = await usersCollection.insertOne(userProfile);
+      res.send(result);
+    });
+
+    app.delete("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await usersCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    // updating only specific fields
+    app.patch("/users", async (req, res) => {
+      const signInfo = req.body;
+      const { email, lastSignInTime } = signInfo;
+      const filter = { email: email };
+      const updatedDoc = {
+        $set: {
+          lastSignInTime: lastSignInTime,
+        },
+      };
+      const result = await usersCollection.updateOne(filter, updatedDoc);
       res.send(result);
     });
     // ===================
